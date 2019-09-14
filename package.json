@@ -1,29 +1,26 @@
 {
   "name": "@mp2t/command",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "./lib/command.js",
   "types": "./lib/command.d.ts",
   "license": "MIT",
   "scripts": {
-    "prepublishOnly": "yarn run compile",
-    "build": "yarn run compile",
+    "prepublishOnly": "yarn run build",
+    "build": "tsc -p .",
     "clean": "gts clean",
     "test": "mocha -r ts-node/register src/**/*.test.ts",
     "check": "gts check",
-    "compile": "tsc -p .",
     "fix": "gts fix",
-    "prepare": "yarn run compile",
-    "pretest": "yarn run compile",
     "posttest": "yarn run check"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.5",
     "@types/sinon": "^7.0.13",
+    "gts": "^1.1.0",
     "mocha": "^6.2.0",
     "sinon": "^7.4.2",
     "ts-node": "^8.3.0",
-    "typescript": "^3.6.3",
-    "gts": "^1.1.0"
+    "typescript": "^3.6.3"
   }
 }
