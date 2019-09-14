@@ -72,7 +72,7 @@ export function command<T>(
 
 export function compose<F extends () => Iterator<any, any, any>>(
   fn: F
-): UndoableCommand<IteratorReturnType<ReturnType<F>>>;
+): UndoableCommand<NonNullable<IteratorReturnType<ReturnType<F>>>>;
 export function compose<T extends Array<Command<any>>>(
   ...cmds: T
 ): UndoableCommand<CommandResults<T>>;
@@ -109,7 +109,7 @@ const normalCompose = <T extends Array<Command<any>>>(
 
 const complexCompose = <F extends () => Iterator<any, any, any>>(
   fn: F
-): UndoableCommand<IteratorReturnType<ReturnType<F>>> => {
+): UndoableCommand<NonNullable<IteratorReturnType<ReturnType<F>>>> => {
   const excutedCommands: Array<Command<any>> = [];
   return command(
     async () => {
