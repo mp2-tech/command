@@ -1,11 +1,11 @@
 {
   "name": "@mp2t/command",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "./lib/command.js",
   "types": "./lib/command.d.ts",
   "license": "MIT",
   "scripts": {
-    "prepublish": "yarn run compile",
+    "prepublishOnly": "yarn run compile",
     "build": "yarn run compile",
     "clean": "gts clean",
     "test": "mocha -r ts-node/register src/**/*.test.ts",
