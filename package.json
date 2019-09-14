@@ -5,6 +5,7 @@
   "types": "./lib/command.d.ts",
   "license": "MIT",
   "scripts": {
+    "prepublish": "build",
     "build": "tsc --declaration",
     "clean": "rm -rf lib",
     "test": "mocha -r ts-node/register src/**/*.test.ts"
