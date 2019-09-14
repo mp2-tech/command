@@ -1,13 +1,14 @@
 {
+  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
-    "outDir": "./lib",
-    "rootDir": "./src",
-    "strict": true,
     "esModuleInterop": true,
-    "types": ["mocha", "node"]
+    "rootDir": "src",
+    "outDir": "lib"
   },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["./src/**/*.test.ts"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclue": [
+    "src/**/*.test.ts"
+  ]
 }

@@ -25,22 +25,19 @@ describe('command', () => {
       const cmd = command<number>(async () => {
         return result;
       });
-      assert.equal(await invoke(cmd), result);
+      assert.strictEqual(await invoke(cmd), result);
     });
 
     it('should execute undo method when an error occurred', async () => {
       const spy = sinon.spy();
       const err = new Error('wtf');
-      const cmd = command(
-        async function() {
-          throw err;
-        },
-        spy,
-      );
+      const cmd = command(async () => {
+        throw err;
+      }, spy);
       try {
         await invoke(cmd);
       } catch (actualErr) {
-        assert.equal(actualErr, err);
+        assert.strictEqual(actualErr, err);
         assert.ok(spy.calledOnce);
       }
     });
@@ -51,36 +48,39 @@ describe('command', () => {
       it('should return an array of command results', async () => {
         const cmd1 = command(() => 123);
         const cmd2 = command(() => 'test');
-        const composedCmd = compose(cmd1, cmd2);
+        const composedCmd = compose(
+          cmd1,
+          cmd2
+        );
         await composedCmd.execute();
-        assert.deepEqual(composedCmd.result, [123, 'test']);
+        assert.deepStrictEqual(composedCmd.result, [123, 'test']);
       });
     });
 
     describe('complex', () => {
       it('should return the result of the given generator function', async () => {
-        const cmd = compose(function* () {
+        const cmd = compose(function*() {
           return 123;
         });
         await cmd.execute();
-        assert.equal(cmd.result, 123);
+        assert.strictEqual(cmd.result, 123);
       });
 
       it('should execute the returned command of the given generator function and return the command result', async () => {
-        const cmd = compose(function* () {
+        const cmd = compose(function*() {
           return command(() => 123);
         });
         await cmd.execute();
-        assert.equal(cmd.result, 123);
+        assert.strictEqual(cmd.result, 123);
       });
 
       it('should pass the result of yield command back to the yield statement', async () => {
-        const cmd = compose(function* () {
+        const cmd = compose(function*() {
           const result: number = yield command(() => 123);
           return result;
         });
         await cmd.execute();
-        assert.equal(cmd.result, 123);
+        assert.strictEqual(cmd.result, 123);
       });
     });
   });

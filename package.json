@@ -5,10 +5,16 @@
   "types": "./lib/command.d.ts",
   "license": "MIT",
   "scripts": {
-    "prepublish": "tsc --declaration",
-    "build": "tsc --declaration",
-    "clean": "rm -rf lib",
-    "test": "mocha -r ts-node/register src/**/*.test.ts"
+    "prepublish": "yarn run compile",
+    "build": "yarn run compile",
+    "clean": "gts clean",
+    "test": "mocha -r ts-node/register src/**/*.test.ts",
+    "check": "gts check",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "prepare": "yarn run compile",
+    "pretest": "yarn run compile",
+    "posttest": "yarn run check"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
@@ -17,6 +23,7 @@
     "mocha": "^6.2.0",
     "sinon": "^7.4.2",
     "ts-node": "^8.3.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.3",
+    "gts": "^1.1.0"
   }
 }
