@@ -70,7 +70,7 @@ export function command<T>(
   return cmd;
 }
 
-export function compose<F extends () => Iterator<any, any, any>>(
+export function compose<F extends () => Generator<any, any, any>>(
   fn: F
 ): UndoableCommand<NonNullable<IteratorReturnType<ReturnType<F>>>>;
 export function compose<T extends Array<Command<any>>>(
@@ -107,7 +107,7 @@ const normalCompose = <T extends Array<Command<any>>>(
   );
 };
 
-const complexCompose = <F extends () => Iterator<any, any, any>>(
+const complexCompose = <F extends () => Generator<any, any, any>>(
   fn: F
 ): UndoableCommand<NonNullable<IteratorReturnType<ReturnType<F>>>> => {
   const excutedCommands: Array<Command<any>> = [];
@@ -116,24 +116,37 @@ const complexCompose = <F extends () => Iterator<any, any, any>>(
       const gen = fn();
       let task: IteratorResult<any, any>;
       let result: any;
+      let taskFailed = false;
       do {
-        task = gen.next(result);
+        task = taskFailed ? gen.throw(result) : gen.next(result);
+        result = undefined;
+        taskFailed = false;
         if (task.value instanceof Array) {
-          await Promise.all(
-            task.value.map(async cmd => {
-              if (isCommand(cmd)) {
-                await cmd.execute();
-                excutedCommands.unshift(cmd);
-              }
-            })
-          );
-          result = task.value.map(cmd => (isCommand(cmd) ? cmd.result : cmd));
+          try {
+            await Promise.all(
+              task.value.map(async cmd => {
+                if (isCommand(cmd)) {
+                  await cmd.execute();
+                  excutedCommands.unshift(cmd);
+                }
+              })
+            );
+            result = task.value.map(cmd => (isCommand(cmd) ? cmd.result : cmd));
+          } catch (err) {
+            result = err;
+            taskFailed = true;
+          }
         } else {
           result = task.value;
           if (isCommand(task.value)) {
-            await task.value.execute();
-            result = task.value.result;
-            excutedCommands.unshift(task.value);
+            try {
+              await task.value.execute();
+              result = task.value.result;
+              excutedCommands.unshift(task.value);
+            } catch (err) {
+              result = err;
+              taskFailed = true;
+            }
           }
         }
       } while (!task.done);

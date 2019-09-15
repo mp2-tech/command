@@ -82,6 +82,59 @@ describe('command', () => {
         await cmd.execute();
         assert.strictEqual(cmd.result, 123);
       });
+
+      it('should pass error back to generator function when command execution failed', async () => {
+        const err = new Error('wtf');
+        const cmd = compose(function*() {
+          try {
+            yield command(() => {
+              throw err;
+            });
+          } catch (err) {
+            return err;
+          }
+        });
+        await cmd.execute();
+        assert.strictEqual(cmd.result, err);
+      });
+
+      it('should undo executed commands', async () => {
+        const noop = () => {};
+        const spy1 = sinon.spy();
+        const spy2 = sinon.spy();
+        const spy3 = sinon.spy();
+        const spy4 = sinon.spy();
+        try {
+          await compose(function*() {
+            yield command(noop, spy1);
+            yield command(noop, spy2);
+            yield command(() => {
+              throw new Error('wtf');
+            }, spy3);
+            yield command(noop, spy4);
+          }).execute();
+        } catch (err) {}
+        assert.ok(spy1.calledOnce);
+        assert.ok(spy2.calledOnce);
+        assert.ok(spy3.calledOnce);
+        assert.ok(!spy4.called);
+      });
+
+      it('should return an array of command results', async () => {
+        const cmd1 = command(() => 1);
+        const cmd2 = command(() => '2');
+        const cmd3 = command(() => true);
+        const composedCmd = compose(function*() {
+          const res: [number, string, boolean] = yield [cmd1, cmd2, cmd3];
+          return res;
+        });
+        await composedCmd.execute();
+        assert.deepStrictEqual(composedCmd.result, [
+          cmd1.result,
+          cmd2.result,
+          cmd3.result,
+        ]);
+      });
     });
   });
 });
